@@ -254,6 +254,9 @@ class CacheController(object):
         #                handle byte range requests
         cacheable_status_codes = status_codes or self.cacheable_status_codes
         if response.status not in cacheable_status_codes:
+            if response.status in (404,):
+                cache_url = self.cache_url(request.url)
+                self.cache.delete(cache_url)
             logger.debug(
                 "Status code %s not in %s", response.status, cacheable_status_codes
             )
