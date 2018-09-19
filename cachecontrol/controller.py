@@ -32,12 +32,14 @@ class CacheController(object):
     """
 
     def __init__(
-        self, cache=None, cache_etags=True, serializer=None, status_codes=None
+        self, cache=None, cache_etags=True, serializer=None, status_codes=None,
+        ignore_304_update_write=False
     ):
         self.cache = DictCache() if cache is None else cache
         self.cache_etags = cache_etags
         self.serializer = serializer or Serializer()
-        self.cacheable_status_codes = status_codes or (200, 203, 300, 301)
+        self.cacheable_status_codes = status_codes or (200, 203, 300, 301),
+        self.ignore_304_update_write = ignore_304_update_write
 
     @classmethod
     def _urlnorm(cls, uri):
@@ -369,6 +371,9 @@ class CacheController(object):
 
         # we want a 200 b/c we have content via the cache
         cached_response.status = 200
+
+        if self.ignore_304_update_write:
+            return cached_response
 
         # update our cache
         self.cache.set(cache_url, self.serializer.dumps(request, cached_response))

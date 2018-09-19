@@ -11,6 +11,7 @@ def CacheControl(
     controller_class=None,
     adapter_class=None,
     cacheable_methods=None,
+    ignore_304_update_write=False,
 ):
 
     cache = DictCache() if cache is None else cache
@@ -22,6 +23,7 @@ def CacheControl(
         heuristic=heuristic,
         controller_class=controller_class,
         cacheable_methods=cacheable_methods,
+        ignore_304_update_write=False,
     )
     sess.mount("http://", adapter)
     sess.mount("https://", adapter)
