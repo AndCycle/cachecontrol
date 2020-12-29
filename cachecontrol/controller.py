@@ -373,6 +373,9 @@ class CacheController(object):
         # we want a 200 b/c we have content via the cache
         cached_response.status = 200
 
+        # ignore 304 update
+        return cached_response
+
         # update our cache
         self.cache.set(cache_url, self.serializer.dumps(request, cached_response))
 
