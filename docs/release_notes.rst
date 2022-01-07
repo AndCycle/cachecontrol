@@ -1,6 +1,17 @@
+..
+  SPDX-FileCopyrightText: SPDX-FileCopyrightText: 2015 Eric Larson
+
+  SPDX-License-Identifier: Apache-2.0
+
 ===============
  Release Notes
 ===============
+
+0.13.0
+======
+
+* Dropped support for Python 2.7, 3.4, 3.5.
+* Reduced memory usage when caching large files.
 
 0.12.0
 ======

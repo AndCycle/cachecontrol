@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2015 Eric Larson
+#
+# SPDX-License-Identifier: Apache-2.0
+
 import sys
 import requests
 import argparse
@@ -34,7 +38,7 @@ def run_benchmark(sess):
     proc.start()
 
     start = datetime.now()
-    for i in xrange(0, 1000):
+    for i in range(0, 1000):
         sess.get(URL)
         sys.stdout.write(".")
     end = datetime.now()

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2015 Eric Larson
+#
+# SPDX-License-Identifier: Apache-2.0
+
 import mock
 import pytest
 
@@ -42,6 +46,11 @@ class TestSessionActions(object):
 
     def test_put_invalidates_cache(self, url, sess):
         r2 = sess.put(url, data={"foo": "bar"})
+        sess.get(url)
+        assert not r2.from_cache
+
+    def test_patch_invalidates_cache(self, url, sess):
+        r2 = sess.patch(url, data={"foo": "bar"})
         sess.get(url)
         assert not r2.from_cache
 

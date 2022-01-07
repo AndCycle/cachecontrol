@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2015 Eric Larson
+#
+# SPDX-License-Identifier: Apache-2.0
+
 import msgpack
 import requests
 
@@ -8,7 +12,6 @@ from cachecontrol.serialize import Serializer
 
 
 class TestSerializer(object):
-
     def setup(self):
         self.serializer = Serializer()
         self.response_data = {
@@ -89,7 +92,9 @@ class TestSerializer(object):
         original_resp = requests.get(url, stream=True)
         req = original_resp.request
 
-        resp = self.serializer.loads(req, self.serializer.dumps(req, original_resp.raw))
+        resp = self.serializer.loads(
+            req, self.serializer.dumps(req, original_resp.raw, original_resp.content)
+        )
 
         assert resp.read()
 
@@ -99,7 +104,7 @@ class TestSerializer(object):
         req = original_resp.request
 
         resp = self.serializer.loads(
-            req, self.serializer.dumps(req, original_resp.raw, body=data)
+            req, self.serializer.dumps(req, original_resp.raw, data)
         )
 
         assert resp.read() == data
@@ -114,5 +119,19 @@ class TestSerializer(object):
         original_resp.raw.headers["vary"] = "Foo"
 
         assert self.serializer.loads(
-            req, self.serializer.dumps(req, original_resp.raw, body=data)
+            req, self.serializer.dumps(req, original_resp.raw, data)
         )
+
+    def test_no_body_creates_response_file_handle_on_dumps(self, url):
+        original_resp = requests.get(url, stream=True)
+        data = None
+        req = original_resp.request
+
+        assert self.serializer.loads(
+            req, self.serializer.dumps(req, original_resp.raw, data)
+        )
+
+        # By passing in data=None it will force a read of the file
+        # handle. Reading it again proves we're resetting the internal
+        # file handle with a buffer.
+        assert original_resp.raw.read()
