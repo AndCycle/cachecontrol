@@ -7,12 +7,14 @@
 tox
 pytest-cov
 pytest
-mock
 cherrypy
 sphinx
 redis
-lockfile
+filelock
 bumpversion
 twine
 black
 wheel
+mypy
+types-redis
+types-requests

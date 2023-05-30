@@ -1,17 +1,16 @@
 # SPDX-FileCopyrightText: 2015 Eric Larson
 #
 # SPDX-License-Identifier: Apache-2.0
+from contextlib import ExitStack, suppress
+from unittest.mock import Mock, patch
+from urllib.parse import urljoin
 
 import pytest
-
-from mock import Mock, patch
-
 import requests
 
 from cachecontrol import CacheControl
 from cachecontrol.cache import DictCache
-from cachecontrol.compat import urljoin
-from .utils import NullSerializer
+from tests.utils import NullSerializer
 
 
 class TestETag(object):
@@ -134,11 +133,20 @@ class TestReleaseConnection(object):
 
         resp = Mock(status=304, headers={})
 
-        # This is how the urllib3 response is created in
-        # requests.adapters
-        response_mod = "requests.adapters.HTTPResponse.from_httplib"
+        # These are various ways the the urllib3 response can created
+        # in requests.adapters.  Which one is actually used depends
+        # on which version if `requests` is in use, as well as perhaps
+        # other parameters.
+        response_mods = [
+            "requests.adapters.HTTPResponse.from_httplib",
+            "urllib3.HTTPConnectionPool.urlopen",
+        ]
 
-        with patch(response_mod, Mock(return_value=resp)):
+        with ExitStack() as stack:
+            for mod in response_mods:
+                with suppress(ImportError):
+                    stack.enter_context(patch(mod, Mock(return_value=resp)))
+
             sess.get(etag_url)
             assert resp.read.called
             assert resp.release_conn.called
