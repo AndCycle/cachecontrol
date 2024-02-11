@@ -7,6 +7,12 @@
  Release Notes
 ===============
 
+0.14.0
+======
+
+* Explicitly allow ``pathlib.Path`` as a type for ``FileCache.directory``.
+* Don't use the cache to return a full response if a request has a Range header.
+
 0.13.1
 ======
 
